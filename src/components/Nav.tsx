@@ -4,26 +4,20 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { nav } from "@/config/content";
-import { scrollToTarget, onReady } from "@/lib/gsap";
+import { scrollToTarget } from "@/lib/gsap";
 import { JoinButton } from "./Buttons";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(true);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    let last = window.scrollY;
     const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 40);
-      if (y > last && y > 240) setHidden(true);
-      else if (y < last) setHidden(false);
-      last = y;
+      setScrolled(window.scrollY > 40);
     };
-    const off = onReady(() => setHidden(false));
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { off(); window.removeEventListener("scroll", onScroll); };
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -39,12 +33,7 @@ export default function Nav() {
 
   return (
     <>
-      <motion.header
-        initial={false}
-        animate={{ y: hidden && !open ? "-110%" : 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-x-0 top-3 z-50 px-3 md:top-5 md:px-5"
-      >
+      <header className="fixed inset-x-0 top-3 z-50 px-3 md:top-5 md:px-5">
         <div className={`mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between rounded-full border pl-3 pr-2 backdrop-blur-xl transition-colors duration-500 md:pl-4 ${scrolled ? "border-white/15 bg-black/75" : "border-white/10 bg-black/40"}`}>
           <a href="#top" onClick={(e) => { e.preventDefault(); go("#top"); }} aria-label="Dark Knight Unisex Fitness Centre, home" className="flex items-center gap-3">
             <Image src="/brand/logo.svg" alt="Dark Knight Unisex Fitness Centre logo" width={640} height={641} priority unoptimized className="h-[3.1rem] w-[3.1rem]" />
@@ -65,7 +54,7 @@ export default function Nav() {
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {open && (
